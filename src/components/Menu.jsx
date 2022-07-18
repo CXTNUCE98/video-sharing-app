@@ -1,6 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import {Link} from 'react-router-dom'
+
 import logo from '../img/logo.png'
 
 import HomeIcon from "@mui/icons-material/Home";
@@ -22,7 +24,7 @@ import SettingsBrightnessOutlinedIcon from "@mui/icons-material/SettingsBrightne
 
 const Container = styled.div`
     flex: 1;
-    background-color: ${({theme}) => theme.bg } ;
+    background-color: ${({theme}) => theme.bgLighter } ;
     height: 100vh;
     color: ${({theme}) => theme.text };
     font-size: 14px;
@@ -52,6 +54,10 @@ const Item = styled.div`
     gap: 20px;
     cursor: pointer;
     padding: 7.5px 0;
+
+    &:hover{
+      background-color: ${({theme}) => theme.soft};
+    }
 `
 
 const Hr = styled.hr`
@@ -88,10 +94,12 @@ const Menu = ({darkMode, setDarkMode}) => {
   return (
     <Container>
       <Wrapper>
-        <Logo>
-            <Img src={logo}/>
-            TCTube
-        </Logo>
+        <Link to='/home' style={{textDecoration:'none', color: 'inherit'}}>
+          <Logo>
+              <Img src={logo}/>
+              TCTube
+          </Logo>
+        </Link>
         <Item>
           <HomeIcon />
           Home
@@ -116,7 +124,9 @@ const Menu = ({darkMode, setDarkMode}) => {
         <Hr />
         <Login>
             Sign in to like videos, comment, and subscribe
-            <Button><AccountCircleOutlinedIcon/>SIGN IN</Button>
+            <Link to='/signin' style={{textDecoration: 'none'}}>
+              <Button><AccountCircleOutlinedIcon/>SIGN IN</Button>
+            </Link>
         </Login>
         <Hr/>
         <Title>
