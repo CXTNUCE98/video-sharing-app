@@ -1,13 +1,22 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
 import styled from 'styled-components'
 
+import {useSelector, useDispatch } from 'react-redux'
+import { useLocation } from 'react-router-dom';
+
 import Card from '../components/Card'
+import Comments from '../components/Comments';
 
 import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
 import ThumbDownOffAltOutlinedIcon from '@mui/icons-material/ThumbDownOffAltOutlined';
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined';
-import Comments from '../components/Comments';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+
+import axios from "axios";
+import { dislike, fetchSuccess, like } from "../redux/videoSlice";
+import { format } from "timeago.js";
 
 const Container = styled.div`
   display: flex;
@@ -112,6 +121,42 @@ const Subscribe = styled.button`
 `
 
 const Video = () => {
+
+  const { currentUser } = useSelector((state) => state.user);
+  const { currentVideo } = useSelector((state) => state.video);
+  const dispatch = useDispatch();
+
+  const path = useLocation().pathname.split("/")[2]
+
+  const [channel, setChannel] = useState({})
+  
+  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try{
+        const videoRes = await axios.get(`/videos/find/${path}`);
+        const channelRes = await axios.get(
+          `/users/find/${videoRes.data.userId}`
+        );
+        console.log(videoRes.data);
+        setChannel(channelRes.data)
+        dispatch(fetchSuccess(videoRes.data))
+      }catch(err){}
+    }
+    fetchData()
+  },[path, dispatch])
+
+  const handleLike = async () => {
+    await axios.put(`/users/like/${currentVideo._id}`)
+    dispatch(like(currentUser._id))
+  }
+
+  const handleDislike = async () => {
+    await axios.put(`/users/dislike/${currentVideo._id}`)
+    dispatch(dislike(currentUser._id))
+  }
+
   return (
     <Container>
       <Content>
@@ -127,12 +172,16 @@ const Video = () => {
           >
           </iframe>
         </VideoWrapper>
-        <Title>Test Video</Title>
+        <Title>{currentVideo.title}</Title>
         <Details>
-          <Info>10,054,278 views * Jun 22, 2022</Info>
+          <Info>{currentVideo.views} views * {format(currentVideo.createdAt)}</Info>
           <Buttons>
-            <Button><ThumbUpAltOutlinedIcon />123</Button>
-            <Button><ThumbDownOffAltOutlinedIcon />Dislike</Button>
+            <Button onClick={handleLike}>
+              {currentVideo.like?.include(currentUser._id) ? <ThumbUpIcon/> : <ThumbUpAltOutlinedIcon />} {currentVideo.likes?.length}
+            </Button>
+            <Button onClick={handleDislike}>
+              {currentVideo.dislike?.includes(currentUser._id) ? <ThumbDownIcon /> : <ThumbDownOffAltOutlinedIcon />}Dislike
+            </Button>
             <Button><ReplyOutlinedIcon />Share</Button>
             <Button><AddTaskOutlinedIcon />Share</Button>
           </Buttons>
@@ -140,14 +189,12 @@ const Video = () => {
         <Hr/>
         <Channel>
           <ChannelInfo>
-            <Image src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9u51RD8AH9uy5NBJQFplwbK5F6b_2lnMsAA&usqp=CAU' />
+            <Image src={channel.img} />
             <ChannelDetail>
-              <ChannelName>TCTube</ChannelName>
-              <ChannelCounter>10M Subscribes</ChannelCounter>
-              <Description>Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                Omnis nam dolorem numquam voluptatibus sunt 
-                laborum doloremque ducimus atque eius accusantium facere excepturi 
-                repellat quidem, quae delectus accusamus unde nihil recusandae?
+              <ChannelName>{channel.name}</ChannelName>
+              <ChannelCounter>{channel.subscribers} Subscribes</ChannelCounter>
+              <Description>
+                {currentVideo.desc}
               </Description>
             </ChannelDetail>
           </ChannelInfo>
@@ -157,7 +204,7 @@ const Video = () => {
         <Comments/>
 
       </Content>
-      <Recommendation>
+      {/* <Recommendation>
         <Card type='sm' />
         <Card type='sm' />
         <Card type='sm' />
@@ -168,7 +215,7 @@ const Video = () => {
         <Card type='sm' />
         <Card type='sm' />
         <Card type='sm' />
-      </Recommendation>
+      </Recommendation> */}
     </Container>
   )
 }

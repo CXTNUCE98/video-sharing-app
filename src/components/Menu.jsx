@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import {useSelector} from 'react-redux'
 
 import {Link} from 'react-router-dom'
 
@@ -91,10 +92,13 @@ const Title = styled.h2`
 `
 
 const Menu = ({darkMode, setDarkMode}) => {
+
+  const {currentUser} = useSelector(state => state.user)
+
   return (
     <Container>
       <Wrapper>
-        <Link to='/home' style={{textDecoration:'none', color: 'inherit'}}>
+        <Link to='/' style={{textDecoration:'none', color: 'inherit'}}>
           <Logo>
               <Img src={logo}/>
               TCTube
@@ -126,13 +130,16 @@ const Menu = ({darkMode, setDarkMode}) => {
           History
         </Item>
         <Hr />
-        <Login>
+        {!currentUser &&
+          <>
+          <Login>
             Sign in to like videos, comment, and subscribe
             <Link to='/signin' style={{textDecoration: 'none'}}>
               <Button><AccountCircleOutlinedIcon/>SIGN IN</Button>
             </Link>
-        </Login>
-        <Hr/>
+          </Login>
+          <Hr/>
+        </>}
         <Title>
             BEST OF TCTUBE
         </Title>
