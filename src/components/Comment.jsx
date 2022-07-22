@@ -1,59 +1,63 @@
-import React from 'react'
-
-import styled from 'styled-components'
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 
 const Container = styled.div`
-    display: flex;
-    gap: 10px;
-    margin: 30px 0;
-`
+  display: flex;
+  gap: 10px;
+  margin: 30px 0px;
+`;
 
 const Avatar = styled.img`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-`
+`;
 
 const Details = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    color: ${({theme}) => theme.text};
-`
-
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: ${({ theme }) => theme.text};
+`;
 const Name = styled.span`
-    font-size: 13px;
-    font-weight: 500;    
-`
+  font-size: 13px;
+  font-weight: 500;
+`;
 
 const Date = styled.span`
-    font-size: 12px;
-    font-weight: 400;
-    color: ${({theme}) => theme.textSoft};
-    margin-left: 5px;
-`
+  font-size: 12px;
+  font-weight: 400;
+  color: ${({ theme }) => theme.textSoft};
+  margin-left: 5px;
+`;
 
 const Text = styled.span`
-    font-size: 14px;
-`
+  font-size: 14px;
+`;
 
-const Comment = () => {
+const Comment = ({ comment }) => {
+  const [channel, setChannel] = useState({});
+
+  useEffect(() => {
+    const fetchComment = async () => {
+      const res = await axios.get(`/users/find/${comment.userId}`);
+      setChannel(res.data)
+    };
+    fetchComment();
+  }, [comment.userId]);
+
   return (
     <Container>
-      <Avatar src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9u51RD8AH9uy5NBJQFplwbK5F6b_2lnMsAA&usqp=CAU' />
+      <Avatar src={channel.img} />
       <Details>
         <Name>
-            Tao Cao <Date>1 day ago</Date>
+          {channel.name} <Date>1 day ago</Date>
         </Name>
-        <Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Inventore culpa repellendus libero. 
-            Perspiciatis repellat, libero minima culpa veniam voluptatem 
-            magni cupiditate laudantium rem fuga magnam facere, odio 
-            praesentium quae sint?
-        </Text>
+        <Text>{comment.desc}</Text>
       </Details>
     </Container>
-  )
-}
+  );
+};
 
-export default Comment
+export default Comment;

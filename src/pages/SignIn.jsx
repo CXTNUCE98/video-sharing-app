@@ -1,12 +1,14 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { async } from "@firebase/util";
+
 import styled from "styled-components";
+
 import { loginFailure, loginStart, loginSuccess } from "../redux/userSlice";
 import { auth, provider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
-import { async } from "@firebase/util";
-import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -75,7 +77,7 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -93,7 +95,6 @@ const SignIn = () => {
     dispatch(loginStart());
     signInWithPopup(auth, provider)
       .then((result) => {
-        console.log(result)
         axios
           .post("/auth/google", {
             name: result.user.displayName,
@@ -118,7 +119,7 @@ const SignIn = () => {
     <Container>
       <Wrapper>
         <Title>Sign in</Title>
-        <SubTitle>to continue to TCTube</SubTitle>
+        <SubTitle>to continue to LamaTube</SubTitle>
         <Input
           placeholder="username"
           onChange={(e) => setName(e.target.value)}

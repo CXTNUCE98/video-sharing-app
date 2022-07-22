@@ -1,4 +1,6 @@
-import React from 'react'
+import axios from 'axios'
+import React, {useState, useEffect} from 'react'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 import Comment from './Comment'
 
@@ -19,28 +21,42 @@ const Avatar = styled.img`
 `
 
 const Input = styled.input`
-    border: none;
-    border-bottom: 1px solid ${({theme}) => theme.soft};
-    background-color: transparent;
-    outline: none;
-    padding: 5px;
-    width: 100%;
-`
+  border: none;
+  border-bottom: 1px solid ${({ theme }) => theme.soft};
+  color: ${({ theme }) => theme.text};
+  background-color: transparent;
+  outline: none;
+  padding: 5px;
+  width: 100%;
+`;
 
 
-const Comments = () => {
+const Comments = ({videoId}) => {
+
+  const {currentUser} = useSelector(state => state.user)
+
+  const [comments, setComments] = useState([])
+
+  useEffect(() => {
+    const fetchComment = async () =>{
+      try{
+        const res = await axios.get(`/comments/${videoId}`)
+        setComments(res.data)
+      }catch(err){
+      }
+    }
+    fetchComment();
+  },[videoId])
+
   return (
     <Container>
       <NewComment>
-        <Avatar src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9u51RD8AH9uy5NBJQFplwbK5F6b_2lnMsAA&usqp=CAU'/>
+        <Avatar src={currentUser.img}/>
         <Input placeholder='Add a comment...' />
       </NewComment>
-      <Comment/>
-      <Comment/>
-      <Comment/>
-      <Comment/>
-      <Comment/>
-      <Comment/>
+      {comments.map(comment => (        
+        <Comment key={comment._id} comment={comment} />
+      ))}
     </Container>
   )
 }
